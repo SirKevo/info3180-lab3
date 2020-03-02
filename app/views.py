@@ -1,4 +1,4 @@
-"""
+  """
 Flask Documentation:     http://flask.pocoo.org/docs/
 Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
 Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
@@ -7,7 +7,7 @@ This file creates your application.
 
 from app import app
 from flask import render_template, request, redirect, url_for, flash
-
+from app.form import ContactForm
 
 ###
 # Routing for your application.
@@ -29,6 +29,22 @@ def about():
 # The functions below should be applicable to all Flask apps.
 ###
 
+@app.route('/contact/')
+def contact():
+    form = ContactForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+
+            name = form.name.data
+            email = form.email.data
+            subject = form.subject.data
+            message = form.message.data
+            
+            flash('You have successfully filled out the form', 'success')
+            return render_template('contact.html', name=name, email=email, subject=subject, message=message)
+
+    flash_errors(form)
+        return render_template('contact.html', form=form)
 
 # Flash errors from the form if validation fails
 def flash_errors(form):
@@ -39,7 +55,7 @@ def flash_errors(form):
                 error
             ), 'danger')
 
-
+    
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):
     """Send your static text file."""
