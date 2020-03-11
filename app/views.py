@@ -1,4 +1,4 @@
-  """
+"""
 Flask Documentation:     http://flask.pocoo.org/docs/
 Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
 Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
@@ -7,7 +7,7 @@ This file creates your application.
 
 from app import app
 from flask import render_template, request, redirect, url_for, flash
-from app.form import ContactForm
+from app.forms import ContactForm
 from app import mail
 from flask_mail import Message
 
@@ -31,7 +31,7 @@ def about():
 # The functions below should be applicable to all Flask apps.
 ###
 
-@app.route('/contact/')
+@app.route('/contact/', methods=['POST','GET'])
 def contact():
     form = ContactForm()
     if request.method == 'POST':
@@ -42,11 +42,15 @@ def contact():
             subject = form.subject.data
             message = form.message.data
             
+            msg = Message(subject, sender=(name, email),recipients=["recipient@example.com"])
+            msg.body = message
+            mail.send(msg)
+
             flash('You have successfully filled out the form', 'success')
-            return render_template('contact.html', name=name, email=email, subject=subject, message=message)
+            return render_template('contact.html', form=form)
 
     flash_errors(form)
-        return render_template('contact.html', form=form)
+    return render_template('contact.html', form=form)
 
 # Flash errors from the form if validation fails
 def flash_errors(form):
